@@ -15,4 +15,5 @@ Prometheus的TSDB 最近吸引了许多新的贡献者，但是由于缺乏资�
 ## 序言
 
 Fabian 的博客可以帮助理解数据模型、核心概念以及 TSDB 整体是如何设计的。他还在2017年 PromCon 大会上就此发表了[演讲](https://www.youtube.com/watch?v=b_pEevMAC3I)。我建议你在阅读这篇文章之前先看看他的博客和演讲，这样可以建立一个良好的基础。
+
 我在这篇文章中阐述的关于 Head 中的样本（sample）的生命周期的内容也可以在我的 [KubeCon 演讲](https://www.youtube.com/watch?v=suMhZfg9Cuk)中找到。

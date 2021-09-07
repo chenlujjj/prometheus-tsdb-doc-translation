@@ -68,11 +68,11 @@ samples 被存储在名为“chunk”的压缩单元中。 当一个 sample 到�
 
 ### 索引在哪里？
 
-索引在内存中，以**反向索引（inverted index）**的形式存储。在 Fabian 的博文中可以看到更多关于索引的总体思路。当 Head block 压缩并创建持久化的 block 时，Head block 会被截断，删除老的 chunks，并且对索引会做垃圾回收（GC），删除不在 Head 中的时序条目。
+索引在内存中，以**反向索引**（inverted index）的形式存储。在 Fabian 的博文中可以看到更多关于索引的总体思路。当 Head block 压缩并创建持久化的 block 时，Head block 会被截断，删除老的 chunks，并且对索引会做垃圾回收（GC），删除不在 Head 中的时序条目。
 
 ### 处理重启
 
-当 TSDB 需要重启（不管是优雅重启还是突然重启）时，它使用在磁盘上的内存映射的 chunks 和 WAL 来重放数据和事件，以此来重建在内存中的索引和 chunk。
+当 TSDB 需要重启（不管是优雅重启还是突然重启）时，它使用在磁盘上做了内存映射的 chunks 和 WAL 来重放数据和事件，以此来重建在内存中的索引和 chunk。
 
 ## 代码参考
 

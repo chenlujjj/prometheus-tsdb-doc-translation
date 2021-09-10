@@ -139,15 +139,32 @@
 
 `Select([]matcher)` 最终返回与匹配器相匹配的所有序列的样本迭代器。这些序列是根据标签对排序了的。
 
-
 ## 一些实现细节
 
+* 获取一个匹配器的 postings 时，所有匹配的条目对应的 postings 不会同时载入到内存中。因为索引是从磁盘上内存映射的，postings 是被延迟迭代的，然后合并来得到最终的列表。
 
+* `Select([]matcher)` 不会预先返回所有序列的所有 sample 迭代器；结果可能有成百上千个序列。它们遵循和上述相似的方式。返回一个迭代器，该迭代器逐个遍历序列，给出它的 sample 迭代器。当被请求时，这个 sample 迭代器会懒加载 chunks。
 
 ## 查询多个 blocks
 
+当有多个 block 与查询器的`mint` 到 `maxt` 的区间重叠时，该查询器实际上是一个合并查询器，它对各个 block 分别查询。这3种查询实际上是这样工作:
+
+1. `LabelNames()`: 从所有 blocks 中获取已排序的标签名，然后做N路合并。
+
+2. `LabelValues(name)`: 从所有 blocks 中获取标签值，然后做N路合并。
+
+3. `Select([]matcher)`: 使用 Select 方法从所有 blocks 中获取序列迭代器，并以迭代方式进行“懒惰的”N路合并。这是可行的，因为每个序列迭代器按照标签对的顺序返回序列。
 
 ## 查询 Head block
 
+Head block 在内存中存储了标签值对和所有的 postings 列表的整个映射map（可以用 `map[labelName]map[labelValue]postingsList` 表示），因此在访问它们时不需要特别注意。执行这3类查询的剩余过程中，对 map 和 postings 列表的处理方式和上述保持一致。
 
 ## 代码参考
+
+`tsdb/index/index.go` 中包含了对持久化 block 执行 `LabelNames()` 和 `LabelValues(name)` 查询的过程和对给定的标签名和值获取合并的 postings 列表的代码。
+
+`tsdb/querier.go` 中包含了对持久化 block 执行 `Select([]matcher)` 查询，包括在从索引中获取 postings 列表前根据匹配器来过滤标签值的代码。 `tsdb/chunks/chunks.go` 中包含了从磁盘上获取 chunks 的代码。
+
+`tsdb/head.go` 包含了对于 Head block 如何执行这3类查询的代码。
+
+`tsdb/db.go` 和 `storage/merge.go` 中，有在查询涉及到多个 blocks 时使用合并查询器的代码。

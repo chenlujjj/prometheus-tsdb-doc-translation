@@ -119,9 +119,16 @@ WAL重放是启动过程中最慢的部分。主要是因为，(1) 从磁盘解�
 
 ## 垃圾回收
 
+内存中的垃圾回收发生在 Head 截断期间，它会丢弃比截断时间 `T` 更老的 chunk 的引用。但文件仍然存在于磁盘上。与WAL段一样，我们也需要定期删除旧内存映射的文件。
+
+对于每个存在的内存映射的 chunk 文件（也就意味着在 TSDB 中打开），我们将文件中存在的所有 chunks 的最大绝对时间存储在内存中。对于活动文件（也就是当前正在写入 chunks 的文件），当添加新的 chunks 时会更新内存中的最大时间。重启期间，当迭代所有内存映射的 chunks 时，会把文件的最大时间恢复到内存中。
+
+所以当 Head 截断是发生在时间`T`之前的数据时，我们称之为以时间`T`对文件截断。最大时间小于`T`的文件（除了活动文件）会在这时被删除，同时会保留文件顺序（举个例子，如果有文件 `5, 6, 7, 8`，其中`5`和`7`在时间`T`以外，那么只有`5`会被删除，剩下的顺序将是`6, 7, 8`)。
+
+在截断之后，我们关闭活动文件并开始一个新的文件，因为在小容量和小规模的设置中，可能需要很长时间才能达到文件的最大大小。因此，在这里滚动文件将有助于在下一次截断期间删除旧的 chunks。
 
 ## 代码参考
 
-`tsdb/chunks/head_chunks.go` has all the implementation of writing chunks to disk, accessing it using a reference, truncation, handling the files, and way to iterate over the chunks.
+`tsdb/chunks/head_chunks.go` 中有写 chunks 到磁盘，通过引用访问它，截断，处理文件，在 chunks 上做迭代的所有实现。
 
-`tsdb/head.go` uses the above as a black box to memory-map its chunks from disk.
+`tsdb/head.go` 中把上述内容当作黑盒使用，把 chunks 从磁盘做内存映射。

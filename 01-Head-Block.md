@@ -9,7 +9,7 @@
 
 Prometheus的TSDB 最近吸引了许多新的贡献者，但是由于缺乏资料，如何理解它已经成为痛点之一。因此，我计划在一系列博客中详细讨论 TSDB 是如何工作的，并且会参考一些源码。
 
-在这篇文章中，我主要讨论 TSDB 的**内存部分** —— **Head block**。在接下来的博客中，我将更深入地讨论其他组件，如 WAL 和它的checkpoint，chunks的memory-mapping是如何设计的，压缩，持久化block和它的索引，还有即将到来的对chunks的快照。
+在这篇文章中，我主要讨论 TSDB 的**内存部分** —— **Head block**。在接下来的博客中，我将更深入地讨论其他组件，如 WAL 和它的检查点，chunks的memory-mapping是如何设计的，压缩，持久化block和它的索引，还有即将到来的对chunks的快照。
 
 
 ## 序言
@@ -60,7 +60,7 @@ samples 被存储在名为“chunk”的压缩单元中。 当一个 sample 到�
 
 ![](https://ganeshvernekar.com/blog/img/tsdb9.svg)
 
-当 Head 中的数据时间跨度达到 `chunkRange*3/2` 时，第一部分`chunkRange`的数据（这里是2h）会被压缩成为持久化的 block。也许你已经注意到了，WAL会在这个时候被截断，并新建一个 checkpoint（图中没有展示出来）。我将会在接下来的博客中阐述 checkpointing，WAL截断，压缩，持久化 block 和它的index的细节。
+当 Head 中的数据时间跨度达到 `chunkRange*3/2` 时，第一部分`chunkRange`的数据（这里是2h）会被压缩成为持久化的 block。也许你已经注意到了，WAL会在这个时候被截断，并新建一个检查点（图中没有展示出来）。我将会在接下来的博客中阐述创建检查点，WAL截断，压缩，持久化 block 和它的index的细节。
 
 这个摄取samples，内存映射，压缩来形成一个持久化 block的过程会循环继续下去。这也就是 Head block 的基本功能。
 

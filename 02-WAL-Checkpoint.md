@@ -35,7 +35,7 @@ TSDB 中的写请求由[序列](https://prometheus.io/docs/concepts/data_model/)
 
 如果写请求包含一个新的序列，那么 `Series` 记录总是写在  `Samples` 记录之前，否则如果 `Samples` 记录在 `Series` 之前，那么在回放时，`Samples`记录中的序列引用将无法指向任何序列。
 
-`Series` 记录是在 Head 中创建序列*之后*写入的，以在记录中存储（序列的）引用，而 `Samples` 记录是在向 Head 添加 samples 之前写入的。
+`Series` 记录是在 Head 中创建序列**之后**写入的，以在记录中存储（序列的）引用，而 `Samples` 记录是在向 Head 添加 samples 之前写入的。
 
 通过将同一个记录中所有不同的时间序列（和不同时间序列的 samples）聚合，每个写请求只写一个 `Series` 和 `Samples` 记录。如果请求中所有 samples
  的序列已经存在于 Head 中，那么只会把一个 `Samples` 记录写入到 WAL 中。

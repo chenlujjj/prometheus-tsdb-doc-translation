@@ -24,7 +24,7 @@
 
 3. `Select([]matcher)`: 返回序列中符合给定的匹配器切片的 samples。稍后我们将详细讨论这些匹配器。
 
-对 block 执行任何查询之前，我们在对 block 创建一个查询器 `Querier`，它有执行查询的最小时间(`mint`)和最大时间(`maxt`)。这个`mint`和`maxt`只适用于`Select` 查询，而其他两类查询总是查看 block 中的所有值。
+在对 block 执行任何查询之前，我们对 block 创建一个查询器 `Querier`，它有执行查询的最小时间(`mint`)和最大时间(`maxt`)。这个`mint`和`maxt`只适用于`Select` 查询，而其他两类查询总是查看 block 中的所有值。
 
 在了解所有3种查询类型之后，我们将讨论如何组合来自多个 block 的结果。
 
@@ -34,7 +34,7 @@
 
 在第4篇文章中提到，`Label Offset Table` 已经不再使用，写这个表只是为了向后兼容。因此，`LabelNames()` 和 `LabelValues()` 都使用 `Postings Offset Table`。
 
-当 block 的索引在启动（或创建块）时被加载时，我们将标签名和**一些**标签值在 postings offset table 中位置的列表的映射 `map[labelName][]postingOffset` 存储起来（目前是每第32个，包括第一个和最后一个标签值）。只存储部分标签值有助于节省内存。这个映射是通过在加载块时遍历 `Postings Offset Table` 中的所有条目来创建的。
+当 block 的索引在启动（或创建block）时被加载时，我们将标签名和**一些**标签值在 postings offset table 中位置的列表的映射 `map[labelName][]postingOffset` 存储起来（目前是每第32个，包括第一个和最后一个标签值）。只存储部分标签值有助于节省内存。这个映射是通过在加载block时遍历 `Postings Offset Table` 中的所有条目来创建的。
 
 > 译注： 这一段话没看明白，需要结合代码梳理。
 
@@ -98,7 +98,7 @@
 
 第一步是获取匹配器匹配的序列。我们需要得到各个匹配器的匹配到的所有序列，然后对它们取交集。
 
-在第4篇文章中，我们看到 “posting” 是序列ID，它告诉我们序列信息在索引中的位置。 `Postings Offset Table` 和 `Postings i` 一起给出了一个标签值对的所有 postings。
+在第4篇文章中，我们看到 "posting" 是序列ID，它告诉我们序列信息在索引中的位置。 `Postings Offset Table` 和 `Postings i` 一起给出了一个标签值对的所有 postings。
 
 #### 为单个匹配器获取 postings
 

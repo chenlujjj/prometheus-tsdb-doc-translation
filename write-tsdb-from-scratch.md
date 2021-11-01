@@ -1,6 +1,6 @@
 # Writing a Time Series Database from Scratch
 
-> 译注：原文地址：https://fabxc.org/tsdb/，由 Prometheus 核心开发者 Fabian Reinartz 写作于2017-04-20。而 Prometheus [2.0.0-alpha.0 版本](https://github.com/prometheus/prometheus/releases/tag/v2.0.0-alpha.0)正是在2017.04发布的。
+> 译注：原文地址：https://fabxc.org/tsdb/。 由 Prometheus 核心开发者 Fabian Reinartz 写作于2017-04-20。而 Prometheus [2.0.0-alpha.0 版本](https://github.com/prometheus/prometheus/releases/tag/v2.0.0-alpha.0)正是在2017.04发布的。
 > 另外，Fabian在PromCon 2017上的演讲 [Storing 16 Bytes at Scale](https://www.youtube.com/watch?v=b_pEevMAC3I) 也非常有参考价值，可以对照观看。[Slides](https://promcon.io/2017-munich/slides/storing-16-bytes-at-scale.pdf)。
 
 Prometheus 的存储层在过去已经展现出了出色的性能，单机每秒可以摄入多达数百万时序的一百万的样本，而只需占用较小的磁盘空间。尽管目前的存储层已经工作得很好了，我还是提出了一个新设计的存储子系统来弥补现有方案的缺陷以及应对更高数量级的数据规模。
